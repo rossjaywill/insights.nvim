@@ -10,9 +10,9 @@ local config = {
 
 M._set_default_keymaps = function()
     -- For running insights on the current buffer:
-    vim.api.nvim_set_keymap('n', '<leader>ci', ':lua require("nvim-insights").run_current_buf()<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<leader>ci', ':lua require("insights").run_current_buf()<CR>', { noremap = true, silent = true })
     -- For selecting a file via telescope
-    vim.api.nvim_set_keymap('n', '<leader>ct', ':lua require("nvim-insights").run_telescope()<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<leader>ct', ':lua require("insights").run_telescope()<CR>', { noremap = true, silent = true })
 end
 
 M.setup = function(opts)
@@ -25,7 +25,6 @@ end
 
 M._write_result = function(result)
   local split = config.use_vsplit and 'vnew' or 'new'
-  print("split: ", split)
   vim.cmd(split)
 
   vim.api.nvim_buf_set_option(0, 'buftype',   'nofile')

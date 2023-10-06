@@ -1,7 +1,5 @@
 # insights.nvim
 
-## Introduction
-
 Neovim integration of cppinsights.
 
 ## Dependencies
@@ -22,9 +20,14 @@ use_libc = true,
 use_vsplit = true,
 ```
 
+Plugin can be initialised with defaults as:
+```lua
+require('insights').setup()
+```
+
 Configuration can be overriden with:
 ```lua
-require('insights.nvim').setup {
+require('insights').setup {
   async = false,
   use_default_keymaps = false,
   use_libc = false,
@@ -39,13 +42,13 @@ Enable plugin using your preference of window manager, or add to run-time path.
 Using lazy.nvim:
 ```lua
 require('lazy').setup({
-    {
-      'rossjaywill/insights.nvim',
-      dependencies = {
-        'nvim-lua/plenary.nvim'
-        'nvim-telescope/telescope.nvim',
-      },
+  {
+    'rossjaywill/insights.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+      'nvim-telescope/telescope.nvim',
     },
+  },
 })
 ```
 
@@ -63,4 +66,4 @@ To open a telescope window to select a file to run insights against:
 
 ## Contributions
 
-All contributions and issues are welcome, feel free to open a PR or raise issues :)
+All contributions and issues welcome, feel free to open a PR or raise issues :)

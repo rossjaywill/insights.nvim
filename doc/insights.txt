@@ -1,0 +1,104 @@
+*insights.nvim.txt* Lua based neovim cppinsights integration
+*insights.nvim*
+
+
+Author: Ross Williamson <rossjwill@gmail.com>
+Github: <https://github.com/rossjaywill/insights.nvim>
+License: MIT
+
+==============================================================================
+Content                                         insights.nvim
+    1. Installation & Dependencies              insights-dependencies
+    2. Configuration                            insights-configuration
+    3. Usage                                    insights-usage
+
+==============================================================================
+INSTALLATION & DEPENDENCIES                                 insights-dependencies
+
+- Neovim: A recent Neovim version is mandatory. The plugin has been thoroughly
+  tested on Neovim 0.7 and its successors.
+
+- cppinsights: Ensure that the `cppinsights` binary is installed and on your
+  `$PATH`. Detailed information on its installation and setup can be found at:
+  https://cppinsights.io/
+- telescope.nvim: For an interactive file selection.
+- plenary.nvim: To allow asynchronous `cppinsights` calls.
+
+==============================================================================
+CONFIGURATION                                                insights-configuration
+
+Several configuration options enable a custom-tailored user experience:
+
+1. Async:
+By default calls to cppinsight are done asynchronously by invoking a plenary
+job, if you wish for this to be done synchronously in nvim's main thread, it
+can be disabled with:
+
+    lua<<
+    require('insights').setup {
+        async = false
+    }
+    >>
+
+It should be noted that this will likely result in a worse user experience for
+large translation units sent to cppinsights.
+
+2. Insights Binary:
+By default the insights binary is assumed to be named 'insights' and be available
+on the current system's path.
+This can overridden with:
+
+    lua<<
+    require('insights').setup {
+        insights = '/path/to/other/insights'
+    }
+    >>
+
+3. Keymaps:
+By default, the plugin offers specific keymaps to initiate its functions.
+However, if you wish to disable these default keymaps, adjust the
+`use_default_keymaps` configuration option to `false`.
+
+    lua<<
+    require('insights').setup {
+        use_default_keymaps = false
+    }
+    >>
+
+User provided keybinds can then be mapped, or extended.
+
+4. Using libc++:
+By default, the `--use-libc++` flag is utilized during `cppinsights` calls. To
+disable it:
+
+    lua<<
+    require('insights').setup {
+        use_libc = false
+    }
+    >>
+
+5. Split behaviour:
+By default insights output is opened in a vertical split, to disable this -
+and enable opening in a horizontal split:
+
+    lua<<
+    require('insights').setup {
+        use_vsplit = false
+    }
+    >>
+
+Ensure the execution of the `setup` function in your Neovim configuration
+(init.vim or init.lua).
+
+==============================================================================
+USAGE                                                         insights-usage
+
+- Run cppinsights against current file:
+In normal mode, press <leader>ci (default) to view the transformed version of your
+current C++ file.
+
+- Interactive File Selection with Telescope:
+Use <leader>ct (default) to select a file for cppinsights to be invoked with.
+
+==============================================================================
+
