@@ -37,7 +37,7 @@ etc
 
 ## Setup
 
-Enable plugin using your preference of window manager, or add to run-time path.
+Enable plugin using your preference of plugin manager, or add to nvim run-time path.
 
 Using lazy.nvim:
 ```lua
