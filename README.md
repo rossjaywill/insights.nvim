@@ -54,7 +54,7 @@ require('lazy').setup({
 
 ## Usage
 
-With the default keybinds, cppinsights can be run against the cuffer buffer with:
+With the default keybinds, cppinsights can be run against the current buffer with:
 ```vim
 <leader>ci
 ```
