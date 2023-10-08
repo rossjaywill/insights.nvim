@@ -2,7 +2,7 @@
 
 Neovim integration of cppinsights.
 
-![Preview](https://i.imgur.com/x0TVpYj.gif)
+![Preview](https://i.imgur.com/nJRCS01.gif)
 
 ## Dependencies
 
