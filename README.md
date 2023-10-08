@@ -2,6 +2,8 @@
 
 Neovim integration of cppinsights.
 
+![Preview](https://i.imgur.com/ICV0z0J.mp4)
+
 ## Dependencies
 
 - **Neovim**: Requires neovim verions > 0.7
