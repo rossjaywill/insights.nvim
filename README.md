@@ -7,7 +7,7 @@ Neovim integration of cppinsights.
 ## Dependencies
 
 - **Neovim**: Requires neovim verions > 0.7
-- **cppinsights**: Requires the `cppinsights` binary available in your `$PATH`. More information on how to install and set it up can be found [here](https://cppinsights.io/).
+- **cppinsights**: Requires the `cppinsights` binary available on your `$PATH`. More information on how to install and set it up can be found [here](https://cppinsights.io/).
 - **plenary.nvim**: Enables asynchronous calls to insights, highly recommended to improve user experience.
 - **telescope.nvim**: Enables interactive selection of files to show insights.
 
@@ -30,9 +30,9 @@ require('insights').setup()
 Configuration can be overriden with:
 ```lua
 require('insights').setup {
-  async = false,
-  use_default_keymaps = false,
-  use_libc = false,
+  async = false,  -- do not use plenary
+  use_default_keymaps = false, -- disable default keymaps, to be user defined
+  use_libc = false, -- do not use libc++ headers
 }
 ```
 etc
