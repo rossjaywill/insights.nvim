@@ -1,30 +1,11 @@
 local M = {}
 
-local config = {
-  async = true,
-  insights_bin = 'insights',
-  use_default_keymaps = true,
-  use_libc = true,
-  use_vsplit = true,
-}
-
-M._set_default_keymaps = function()
-    -- For running insights on the current buffer:
-    vim.api.nvim_set_keymap('n', '<leader>ci', ':lua require("insights").run_current_buf()<CR>', { noremap = true, silent = true })
-    -- For selecting a file via telescope
-    vim.api.nvim_set_keymap('n', '<leader>ct', ':lua require("insights").run_telescope()<CR>', { noremap = true, silent = true })
-end
-
-M.setup = function(opts)
-    -- Default options
-  config = vim.tbl_extend('force', config, opts or {})
-  if config.use_default_keymaps then
-    M._set_default_keymaps()
-  end
-end
+local plugin_setup = require'insights.setup'
+M.setup = function(opts) plugin_setup.setup(opts) end
+M._config = plugin_setup.get_config()
 
 M._write_result = function(result)
-  local split = config.use_vsplit and 'vnew' or 'new'
+  local split = M._config.use_vsplit and 'vnew' or 'new'
   vim.cmd(split)
 
   vim.api.nvim_buf_set_option(0, 'buftype',   'nofile')
@@ -35,12 +16,12 @@ M._write_result = function(result)
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(result, "\n"))
 end
 
-M._run_async = function(file)
+M._run_local_async = function(file)
+  local lib = M._config.use_libc and '--use-libc++' or ''
   local runner = require'plenary.job'
-  local lib = config.use_libc and '--use-libc++' or ''
 
   local job = runner:new {
-    command = config.insights_bin,
+    command = M._config.insights_bin,
     args = { file, lib },
     on_exit = function(j, exit_code)
       vim.schedule(function()
@@ -57,38 +38,82 @@ M._run_async = function(file)
   job:start()
 end
 
-M._run_sync = function(file)
-  local lib = config.use_libc and '--use-libc++' or ''
-  local result = vim.fn.system({config.insights_bin, file, lib})
+M._run_local_sync = function(file)
+  local lib = M._config.use_libc and '--use-libc++' or ''
+  local result = vim.fn.system({M._config.insights_bin, file, lib})
   M._write_result(result)
 end
 
-M._run_insights = function(file)
-  if not vim.fn.executable(config.insights_bin) then
-    vim.api.nvim_out_write('insights binary not found, please ensure it is installed and on your PATH')
-  end
-
-  if config.async then
-    M._run_async(file)
+M._run_local_insights = function(file)
+  if M._config.async then
+    M._run_local_async(file)
   else
-    M._run_async(file)
+    M._run_local_sync(file)
   end
-
 end
 
-M.run_current_buf = function ()
-  local file = vim.fn.expand('%:p')
-  M._run_insights(file)
+M._run_web_insights = function(file)
+  local curl = require'insights.curl'
+
+  -- get data from current buffer
+  local f = io.open(file, 'r')
+  if not f then
+    vim.api.nvim_out_write('Could not open cpp file: ', file)
+    return
+  end
+  local content = f:read('*all')
+  f:close()
+
+  if M._config.async then
+    curl.async_http_request(content, M._write_result)
+  else
+    curl.http_request(content, M._write_result)
+  end
+end
+
+-- determine whether to run against local cppinsights
+-- or make http request to cppinsights.io
+M._find_run_env = function(file)
+  local bin_exists = true
+  if vim.fn.executable(M._config.insights_bin) ~= 1 then
+    bin_exists = false
+  end
+
+  if M._config.local_only and M._config.http_only then
+    vim.api.nvim_out_write("I can't run anywhere, please disable one of either `local_only` or `http_only`")
+    return
+  end
+
+  if M._config.http_only then
+    M._run_web_insights(file)
+    return
+  end
+
+  if bin_exists then
+    M._run_local_insights(file)
+  elseif M._config.run_local then
+    vim.api.nvim_out_write('insights binary not found, please ensure it is installed and on your PATH, or allow HTTP')
+  else
+    M._run_web_insights(file)
+  end
+end
+
+
+M.run_current_buf = function()
+  M._config = plugin_setup.get_config()
+  local current_buf = vim.fn.expand('%:p')
+  M._find_run_env(current_buf)
 end
 
 M.run_telescope = function()
+  M._config = plugin_setup.get_config()
   require('telescope.builtin').find_files({
     prompt_title = 'Run cppinsights on: ',
     attach_mappings = function(prompt_bufnr, map)
       local function on_selection()
         local selection = require('telescope.actions.state').get_selected_entry()
         require('telescope.actions').close(prompt_bufnr)
-        M._run_insights(selection.value)
+        M._find_run_env(selection.value)
       end
 
     map('i', '<CR>', on_selection)

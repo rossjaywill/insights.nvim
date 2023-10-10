@@ -1,0 +1,6 @@
+{
+  "insightsOptions": [
+    "cpp17"
+  ],
+  "code": "#include <cstdio>\n\nint main()\n{\n    const char arr[10]{2,4,6,8};\n\n    for(const char& c : arr)\n    {\n      printf(\"c=%c\\n\", c);\n    }\n}"
+}
